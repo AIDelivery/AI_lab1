@@ -1,6 +1,7 @@
 from copy import deepcopy
-import utilLib as st
 
+nor = 3
+noc = 3
 SHIFTS = 0
 
 """
@@ -8,18 +9,6 @@ SHIFTS = 0
 10 11 12
 20 21 22
 """
-
-
-# print matrix
-def showMatrix(matrix, beg=None, end=None):
-    if beg:
-        print(beg)
-
-    for i in matrix:
-        print(i)
-
-    if end:
-        print(end)
 
 
 # Get number of available moves from the current *state*
@@ -32,7 +21,7 @@ def NumOfMoves(state):
 
 
 # Generates coordinates of available moves, except previous
-def GenMoves(curState, prState=[3, 3]):
+def GenMoves(curState, prState):
     d = list()
     n = NumOfMoves(curState)
 
@@ -70,64 +59,18 @@ def GenMoves(curState, prState=[3, 3]):
 
 
 # Find 0 integer value in matrix
-def FindNull(matrix):
+def FindNull(matrix: list):
     res = -1
 
-    for i in range(0, st.nor):
+    for i in range(0, nor):
         try:
-            res = matrix[i].index(0, 0, st.noc)
+            res = matrix[i].index(0, 0, noc)
         except:
             continue
 
         return list([i, res])
 
     raise Exception("Error. There is no 0 in matrix...")
-
-
-# BFS-scan
-def layerScan(matrixList, queueForEachMatrix, nullInEachMatrix, depth=1):
-    # new matrixList, queueForEachMatrix, nullInEachMatrix
-    # for the next layer
-    listOfMatrixs = list()
-    listOfQueues = list()
-    listOfNulls = list()
-    global SHIFTS
-
-    for matrix, nodeQueue, nullPnt in zip(matrixList, queueForEachMatrix, nullInEachMatrix):
-        # print("\n", matrixList)
-        # print(matrix)
-        # print(queueForEachMatrix)
-        # print(nodeQueue)
-        # print(nullInEachMatrix)
-        # print(nullPnt, "\n")
-
-        for i in nodeQueue:
-            newMatrix = deepcopy(matrix)
-
-            # print("\nBefore:")
-            # showMatrix(newMatrix)
-
-            newMatrix[nullPnt[0]][nullPnt[1]] = newMatrix[i[0]][i[1]]
-            newMatrix[i[0]][i[1]] = 0
-            SHIFTS += 1
-
-            # print("After:")
-            # showMatrix(newMatrix)
-
-            if newMatrix == pointSet:
-                print("\n\n - - -\nLA FINALE\n - - -\n\n")
-                showMatrix(newMatrix)
-                print("Depth: ", depth)
-                return
-            else:
-                newNullPnt = [i[0], i[1]]
-                newShiftQueue = GenMoves(newNullPnt, nullPnt)
-
-                listOfMatrixs.append(newMatrix)
-                listOfQueues.append(newShiftQueue)
-                listOfNulls.append(newNullPnt)
-
-    layerScan(listOfMatrixs, listOfQueues, listOfNulls, depth + 1)
 
 
 '''

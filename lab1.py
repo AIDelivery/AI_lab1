@@ -2,30 +2,81 @@ from copy import deepcopy
 import utilLib as lib
 from test import FindNull, NumOfMoves, GenMoves
 
+initMatrix = lib.bs8
+targetMatrix = lib.ts1
+
+class node: pass
 
 class node:
     depth = 0
-    parent = None
+    parent: node
     matrix = list()
-    nodeList = list()
+    childList = list()
+    parentMove = list()
 
-    def __init__(self, depth, parentPointer, matrix):
+    def __init__(self, depth, parentPointer, matrix, parentMove):
         self.depth = depth
         self.parent = parentPointer
         self.matrix = matrix
-        self.nodeList = list()
+        self.parentMove = parentMove
 
-    def addDescendant(self, matrix):
+    def _d_addSuccessor(self, matrix):
         childNode = node(self.depth + 1, self, matrix)
-        self.nodeList.append(childNode)
+        self.childList.append(childNode)
         return childNode
 
-    def showDescendants(self):
+    def _d_showSuccessors(self):
         print("\t", self)
-        for i in range(0, self.nodeList.__len__()):
-            print("Node %d | Depth %d" % (i, self.nodeList[i].depth))
+        for i in range(0, self.childList.__len__()):
+            print("Node %d | Depth %d" % (i, self.childList[i].depth))
+
+    def makeChilds(self):
+        nullPnt = FindNull(self.matrix)
+        moveList = list()
+        if self.parent == None:
+            moveList = GenMoves(nullPnt, [3, 3])
+        else:
+            moveList = GenMoves(nullPnt, FindNull(self.parent.matrix))
+
+        for move in moveList:
+            x = move[0]
+            y = move[1]
+            x0 = nullPnt[0]
+            y0 = nullPnt[1]
+
+            newMatrix = deepcopy(self.matrix)
+
+            newMatrix[x0][y0] = newMatrix[x][y]
+            newMatrix[x][y] = 0
+
+            self.childList.append(node(self.depth + 1, self, newMatrix, nullPnt))
 
 
+# recursive Depth-Limited-Search
+def recursiveDLS(currentNode, limit):
+    if currentNode.matrix == targetMatrix:
+        print(currentNode.matrix)
+        return 1
+    elif node.depth == limit:
+        return 0
+
+    currentNode.makeChilds()
+
+    for childNode in currentNode.childList:
+        res = recursiveDLS(childNode, limit)
+        # Match!
+        if res == 1:
+            print("\n\n- - - Finally! - - -")
+            return 1
+        # Not match
+        elif res == 0:
+            pass
+
+rootNode = node(0, None, initMatrix, [3, 3])
+
+for i in range(0, 10):
+    recursiveDLS(rootNode, i)
+"""
 class tree:
     treeDepth = None
     root = None
@@ -117,3 +168,5 @@ class tree:
 myTree = tree(lib.bs1, lib.ts1)
 myTree.showPath()
 myTree.doJob()
+
+"""
