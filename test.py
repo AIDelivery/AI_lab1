@@ -13,14 +13,16 @@ SHIFTS = 0
 
 # Get number of available moves from the current *state*
 def NumOfMoves(state):
-    if state[0] == state[1] == 1:
+    stateNull = FindNull(state)
+
+    if stateNull[0] == stateNull[1] == 1:
         return 4
-    elif state[0] != 1 and state[1] != 1:
+    elif stateNull[0] != 1 and stateNull[1] != 1:
         return 2
     return 3
 
 
-# Generates coordinates of available moves, except previous
+# Generates coordinates of available moves, except previous state
 def GenMoves(curState, prState):
     d = list()
     n = NumOfMoves(curState)
@@ -59,44 +61,59 @@ def GenMoves(curState, prState):
 
 
 # Find 0 integer value in matrix
-def FindNull(matrix: list):
-    res = -1
+def FindNull(matrix: list) -> list or None:
+    if matrix == None:
+        return None
 
-    for i in range(0, nor):
-        try:
-            res = matrix[i].index(0, 0, noc)
-        except:
-            continue
 
-        return list([i, res])
+    for i in range(0, 3):
+        for j in range(0, 3):
+            if matrix[i][j] == 0:
+                return [i, j]
 
     raise Exception("Error. There is no 0 in matrix...")
 
 
-'''
-print("""
-            Меню
 
-1. Выполнение программы
-2. Пошаговое выполнение программы""")
-ans = input("\n>>> ")
-'''
+# Generates coordinates of available moves, except previous state
+def GenMovesN(curState, prState = None):
+    movesAvailable = list()
+    curStateNull = FindNull(curState)
+    prStateNull = FindNull(prState)
+    n = NumOfMoves(curState)
 
-#
-# initSet = st.bs8
-# pointSet = st.ts1
-# nullPos = list()
-# shiftQueue = list()
-#
-# nullPos = FindNull(initSet)
-# shiftQueue = GenMoves(nullPos)
-# showMatrix(initSet)
-#
-# initMatrix = list()
-# initMatrix.append(initSet)
-# initQueue = list()
-# initQueue.append(shiftQueue)
-# initNullPos = list()
-# initNullPos.append(nullPos)
-#
-# layerScan(initMatrix, initQueue, initNullPos)
+    if n == 4:
+        movesAvailable.append([0, 1])
+        movesAvailable.append([1, 0])
+        movesAvailable.append([2, 1])
+        movesAvailable.append([1, 2])
+    elif n == 3:
+        movesAvailable.append([1, 1])
+        if curStateNull[0] == 0 or curStateNull[0] == 2:
+            movesAvailable.append([curStateNull[0], 0])
+            movesAvailable.append([curStateNull[0], 2])
+        else:
+            movesAvailable.append([2, curStateNull[1]])
+            movesAvailable.append([0, curStateNull[1]])
+    else:
+        movesAvailable.append([1, curStateNull[1]])
+        if curStateNull[0] == 0:
+            movesAvailable.append([0, 1])
+        else:
+            movesAvailable.append([2, 1])
+
+    try:
+        movesAvailable.remove(prStateNull)
+    except:
+        pass
+
+    # if curState[2][0] == 7 and curState[2][1] == 8 and curState[0][0] == 1 and curState[0][1] == 2 and curState[0][2] == 3:
+        print("Current State: ")
+        for i in curState:
+            print(i)
+        print("Available moves: ", end=" ")
+        for i in movesAvailable:
+            print(i, end=" ")
+        print('\n')
+
+    return movesAvailable

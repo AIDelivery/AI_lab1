@@ -1,42 +1,50 @@
 from copy import deepcopy
 import utilLib as lib
-from test import FindNull, NumOfMoves, GenMoves
+from test import FindNull as FindNullN, NumOfMoves, GenMovesN
+from collections import deque
 
 initMatrix = lib.bs8
 targetMatrix = lib.ts1
+LEFT = 1
+RIGHT = 2
+UP = 3
+DOWN = 4
+MOVE_COST = 1
 
 class node: pass
 
 class node:
-    depth = 0
-    parent: node
-    matrix = list()
-    childList = list()
-    parentMove = list()
-
-    def __init__(self, depth, parentPointer, matrix, parentMove):
+    def __init__(self, state, depth = 0, parentPointer = None, parentMove = None):
         self.depth = depth
+        self.pathCost = depth
         self.parent = parentPointer
-        self.matrix = matrix
         self.parentMove = parentMove
+        self.matrix = state
+        self.childList = list()
 
-    def _d_addSuccessor(self, matrix):
+
+    def addSuccessor(self, matrix):
         childNode = node(self.depth + 1, self, matrix)
         self.childList.append(childNode)
         return childNode
 
-    def _d_showSuccessors(self):
+    def showSuccessors(self):
         print("\t", self)
         for i in range(0, self.childList.__len__()):
             print("Node %d | Depth %d" % (i, self.childList[i].depth))
 
+
     def makeChilds(self):
-        nullPnt = FindNull(self.matrix)
+        nullPnt = FindNullN(self.matrix)
         moveList = list()
+
+        # print("\n\n", nullPnt, "\n\n")
+        # print("\n\n", self.matrix, "\n\n")
+
         if self.parent == None:
-            moveList = GenMoves(nullPnt, [3, 3])
+            moveList = GenMovesN(self.matrix)
         else:
-            moveList = GenMoves(nullPnt, FindNull(self.parent.matrix))
+            moveList = GenMovesN(self.matrix, self.parent.matrix)
 
         for move in moveList:
             x = move[0]
@@ -49,124 +57,102 @@ class node:
             newMatrix[x0][y0] = newMatrix[x][y]
             newMatrix[x][y] = 0
 
-            self.childList.append(node(self.depth + 1, self, newMatrix, nullPnt))
+            self.childList.append(node(newMatrix, self.depth + 1, self, None))
+
+        return self.childList
+
+    def isEqual(self, state : node):
+        if self.matrix == state.matrix:
+            return True
+        else:
+            return False
 
 
-# recursive Depth-Limited-Search
-def recursiveDLS(currentNode, limit):
-    if currentNode.matrix == targetMatrix:
-        print(currentNode.matrix)
-        return 1
-    elif node.depth == limit:
+class eightPuzzleProblem:
+    cutoffStates = deque()
+    steps = 0
+
+    def __init__(self, initState, winState):
+        self.initState = initState
+        self.winState = winState
+
+    # def isFinishState(self, state):
+    #     return state == self.winState
+
+    def BFS(self, currentNode : node, checkQueue):
+        if self.winState == currentNode.matrix:
+            print("Ready")
+            return 1
+
+        self.steps += 1
+        checkQueue.extend(currentNode.makeChilds())
         return 0
 
-    currentNode.makeChilds()
+    def runBFS(self):
+        root = node(self.initState)
+        checkQueue = deque()
+        checkQueue.append(root)
 
-    for childNode in currentNode.childList:
-        res = recursiveDLS(childNode, limit)
-        # Match!
-        if res == 1:
-            print("\n\n- - - Finally! - - -")
+        while True:
+            nodeToCheck = checkQueue.popleft()
+
+            # if nodeToCheck in self.cutoffStates:
+            #     continue
+            # else:
+            #     self.cutoffStates.append(nodeToCheck)
+
+            if self.BFS(nodeToCheck, checkQueue) == 1:
+                print("Success")
+                return 0
+
+    # Depth-Limited-Search subfunction
+    def recursiveDLS(self, currentNode : node, limit):
+
+        # if currentNode in self.cutoffStates:
+        #     return 0
+        # else:
+        #     self.cutoffStates.append(currentNode)
+
+        self.steps += 1
+
+        if currentNode.matrix == self.winState:
             return 1
-        # Not match
-        elif res == 0:
-            pass
+        elif currentNode.depth == limit:
+            return 0
 
-rootNode = node(0, None, initMatrix, [3, 3])
+        currentNode.makeChilds()
 
-for i in range(0, 10):
-    recursiveDLS(rootNode, i)
-"""
-class tree:
-    treeDepth = None
-    root = None
-    beginState = list()
-    targetState = list()
-    nodeQueue = list()
+        # print("CHILDLIST")
+        # for i in currentNode.childList:
+        #     print(i.matrix[0])
+        #     print(i.matrix[1])
+        #     print(i.matrix[2])
+        # print("/CHILDLIST")
 
-    def __init__(self, bs, ts) -> None:
-        self.treeDepth = 0
-        self.root = node(0, None, bs)
-        self.nodeQueue.append(self.root)
-        self.beginState = bs
-        self.targetState = ts
+        for childNode in currentNode.childList:
+            res = self.recursiveDLS(childNode, limit)
 
-    def showPath(self) -> None:
-        print("Start:", self.beginState)
-        print("Finish:", self.targetState)
+            # Match!
+            if res == 1:
+                return 1
+            # Not match
+            elif res == 0:
+                pass
 
-    def showQueue(self) -> None:
-        for i in self.nodeQueue:
-            print(i)
+    def DLS(self, limit):
+        root = node(self.initState, 0)
+        return self.recursiveDLS(root, limit)
 
-    def showTree(self, nodesInLayer, layer = 0):
-        if layer == 0:
-            print("- - - Tree root - - -")
+    def iterativeDLS(self, maxLimit):
+        for i in range(1, maxLimit):
+            self.cutoffStates.clear()
+            print("Level", i)
+            if self.DLS(i) == 1:
+                print("Success\n", "Steps:", self.steps)
+                return 1
 
-        n = nodesInLayer.__len__()
-        lst = list()
+        return 0
 
-        if n == 0:
-            print("\n\n- - - End of tree - - -")
-            return
-
-        print("\n[%d]: " % layer, end=None)
-
-        for i in nodesInLayer:
-            print("| ", end=' ')
-            lst.extend(i.nodeList)
-
-        self.showTree(lst, layer + 1)
-
-    # run through deepest layer of the tree
-    # check for finish
-    # build new descendants for all deepest nodes
-    def doLayer(self):
-        newNodeQueue = list()
-
-        for curNode in self.nodeQueue:
-            if curNode == self.targetState:
-                print("RDY:", curNode.matrix)
-                exit(0)
-
-            nullCoord = FindNull(curNode.matrix)
-            if curNode == self.root:
-                parentNullCoord = [3, 3]
-            else:
-                parentNullCoord = FindNull(curNode.parent.matrix)
-
-            #
-            print(parentNullCoord)
-            #
-
-            for toSwitchCoord in GenMoves(nullCoord, parentNullCoord):
-                newMatrix = deepcopy(curNode.matrix)
-
-                x = toSwitchCoord[0]
-                y = toSwitchCoord[1]
-                x0 = nullCoord[0]
-                y0 = nullCoord[1]
-
-                newMatrix[x0][y0] = newMatrix[x][y]
-                newMatrix[x][y] = 0
-
-                curNode.addDescendant(newMatrix)
-
-            newNodeQueue.extend(curNode.nodeList)
-
-        self.nodeQueue = newNodeQueue
-        self.treeDepth += 1
-
-    def doJob(self):
-        for i in range(0, 50):
-            self.doLayer()
-        lst = list()
-        lst.append(self.root)
-        self.showTree(lst)
-
-
-myTree = tree(lib.bs1, lib.ts1)
-myTree.showPath()
-myTree.doJob()
-
-"""
+tempMatrix = [[1, 2, 3],[4, 6, 0],[7, 5, 8]]
+problem = eightPuzzleProblem(initMatrix, targetMatrix)
+print(problem.iterativeDLS(100))

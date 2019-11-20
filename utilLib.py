@@ -1,7 +1,7 @@
 nor = 3
 noc = 3
 
-# Target state list
+# Start state list
 
 bs1 = [
 [5, 8, 3],
