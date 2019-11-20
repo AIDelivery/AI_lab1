@@ -1,6 +1,8 @@
 from copy import deepcopy
 from util import find_null, gen_moves
 
+LOG = True
+
 
 class Node:
     def __init__(self, state, depth = 0, parent_pointer = None):
@@ -22,6 +24,9 @@ class Node:
         else:
             moveList = gen_moves(self.matrix, self.parent.matrix)
 
+        if LOG:
+            print("\nSucessors:")
+
         for move in moveList:
             x = move[0]
             y = move[1]
@@ -34,5 +39,8 @@ class Node:
             newMatrix[x][y] = 0
 
             self.childList.append(Node(newMatrix, self.depth + 1, self))
+
+            if LOG:
+                print(newMatrix)
 
         return self.childList

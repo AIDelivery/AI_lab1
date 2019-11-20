@@ -1,20 +1,22 @@
 from collections import deque
+
 from node import Node
+
+LOG = True
+
 
 class eightPuzzleProblem:
     cutoffStates = deque()
     steps = 0
+    nodesToWait = 0
 
     def __init__(self, initState, winState):
         self.initState = initState
         self.winState = winState
 
-    # def isFinishState(self, state):
-    #     return state == self.winState
-
     def BFS(self, currentNode : Node, checkQueue):
         if self.winState == currentNode.matrix:
-            print("Ready")
+            print("[Success!]")
             return 1
 
         self.steps += 1
@@ -29,10 +31,18 @@ class eightPuzzleProblem:
         while True:
             NodeToCheck = checkQueue.popleft()
 
-            # if NodeToCheck in self.cutoffStates:
-            #     continue
-            # else:
-            #     self.cutoffStates.append(NodeToCheck)
+            if LOG:
+                input()
+                print("\nCurrent node:", end=" ")
+                print(NodeToCheck.matrix)
+                print("Number of nodes in queue: %d" % len(checkQueue))
+
+            if NodeToCheck.matrix in self.cutoffStates:
+                if LOG:
+                    print("[State repeat detected]")
+                continue
+            else:
+                self.cutoffStates.append(NodeToCheck.matrix)
 
             if self.BFS(NodeToCheck, checkQueue) == 1:
                 print("Success")
@@ -41,10 +51,16 @@ class eightPuzzleProblem:
     # Depth-Limited-Search subfunction
     def recursiveDLS(self, currentNode : Node, limit):
 
-        # if currentNode in self.cutoffStates:
-        #     return 0
-        # else:
-        #     self.cutoffStates.append(currentNode)
+        if LOG:
+            input()
+            print("\nCurrent node:", end=" ")
+            print(currentNode.matrix)
+            print("Waiting nodes: %d" % self.nodesToWait)
+
+        if currentNode.matrix in self.cutoffStates:
+            return 0
+        else:
+            self.cutoffStates.append(currentNode.matrix)
 
         self.steps += 1
 
@@ -54,6 +70,8 @@ class eightPuzzleProblem:
             return 0
 
         currentNode.makeChilds()
+        self.nodesToWait += len(currentNode.childList)
+        self.nodesToWait -= 1
 
         # print("CHILDLIST")
         # for i in currentNode.childList:
