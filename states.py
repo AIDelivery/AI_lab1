@@ -1,6 +1,3 @@
-nor = 3
-noc = 3
-
 # Start state list
 
 bs1 = [
