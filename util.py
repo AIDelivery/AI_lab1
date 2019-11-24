@@ -7,6 +7,19 @@ from copy import deepcopy
 """
 
 
+def is_matrix(matrix: list, size: int=3) -> bool:
+    res = False
+    try:
+        str = len(matrix)
+        col = len(matrix[0])
+
+        if str == col == size:
+            res = True
+    except: print(matrix, "IS NOT A MATRIX")
+
+    return res
+
+
 def find_null(matrix: list) -> list or None:
     """
     Locate 0 in puzzle

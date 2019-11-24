@@ -25,6 +25,7 @@ class Node:
             moveList = gen_moves(self.matrix, self.parent.matrix)
 
         if LOG:
+            print("Parent:", self.matrix[0], self.matrix[1], self.matrix[2], sep = "\n")
             print("\nSucessors:")
 
         for move in moveList:
@@ -41,6 +42,8 @@ class Node:
             self.childList.append(Node(newMatrix, self.depth + 1, self))
 
             if LOG:
-                print(newMatrix)
+                print(newMatrix[0])
+                print(newMatrix[1])
+                print(newMatrix[2], end='\n\n')
 
         return self.childList

@@ -9,6 +9,8 @@ class eightPuzzleProblem:
     cutoffStates = deque()
     steps = 0
     nodesToWait = 0
+    initState = list
+    winState = list
 
     def __init__(self, initState, winState):
         self.initState = initState
