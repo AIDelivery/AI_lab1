@@ -1,7 +1,26 @@
-from node import Node
-from util import is_matrix
+from node import Node, find_in_2d_array
+# from util import is_matrix
 
 LOG = True
+
+""" Matrix numeration:
+00 01 02
+10 11 12
+20 21 22
+"""
+
+
+def is_matrix(matrix: list, size: int=3) -> bool:
+    res = False
+    try:
+        str = len(matrix)
+        col = len(matrix[0])
+
+        if str == col == size:
+            res = True
+    except: print(matrix, "IS NOT A MATRIX")
+
+    return res
 
 
 def count_match_places(current_state: list, target_state: list) -> int:
@@ -13,17 +32,25 @@ def count_match_places(current_state: list, target_state: list) -> int:
     """
     matches = 0
 
-    for i in range(0, 3):
-        for j in range(0, 3):
+    for i in range(3):
+        for j in range(3):
             if current_state[i][j] == target_state[i][j]:
                 matches += 1
 
-    if LOG:
-        print("[count_match_places]", current_state, matches)
+    # if LOG:
+    #     print("[count_match_places]", current_state, matches)
     return matches
 
 
-def which_match_is_greater(target_matrix: list, nodes_to_check: list, matrix_history: list, other_unique_nodes: list = None) -> Node or None:
+def which_match_is_greater(target_matrix: list, nodes_to_check, matrix_history: list) -> Node:
+    """
+    IF nodes_to_check ISN'T None, THERE WILL BE NODE IN RETURN
+    :param target_matrix:
+    :param nodes_to_check:
+    :param matrix_history:
+    :param other_unique_nodes:
+    :return:
+    """
     res_node = None
     maxim = 0
 
@@ -36,51 +63,31 @@ def which_match_is_greater(target_matrix: list, nodes_to_check: list, matrix_his
         elif match_count > maxim:
             res_node = node
             maxim = match_count
-            matrix_history.append(matrix)
-        elif other_unique_nodes is not None:
-            other_unique_nodes.append(node)
-        else:
-            raise Exception("Error. Try put additional node list in which_match_is_greater as last argument")
+        # elif other_unique_nodes is not None:
+        #     other_unique_nodes.append(node)
+        # else:
+        #     raise Exception("Error. Try put additional node list in which_match_is_greater as last argument")
+
+    if res_node:
+        matrix_history.append(res_node.matrix)
+
+    # try:
+    #     # other_unique_nodes.remove(res_node)
+    #     matrix_history.append(res_node.matrix)
+    # except:
+    #     print("Error. matrix_history is None\nOR\nchildList is Empty \nOR\n other_unique_nodes is None")
 
     return res_node
 
 
-def manhattan_dist1(current_state: list, target_state: list, square: int) -> int:
+def manhattan_dist(current_state: list, target_state: list, square: int) -> int:
     if not is_matrix(current_state) or not is_matrix(target_state):
         raise Exception("Error. Null pointer as argument")
 
-    current_coords = list([-1, -1])
-    target_coords = list([-1, -1])
-    i = j = 0
+    current_coords = find_in_2d_array(current_state, square)
+    target_coords = find_in_2d_array(target_state, square)
 
-    for i in range(0, 3):
-        for j in range(0, 3):
-            if current_state[i][j] == square:
-                current_coords = [i, j]
-            if target_state[i][j] == square:
-                target_coords = [i, j]
-
-    if current_coords == [-1, -1] or target_coords == [-1, -1]:
-        raise Exception("Error. Matrix is invalid. There isn't %d square" % square)
+    if current_coords is None or target_coords is None:
+        raise Exception("[manhattan_dist] Error. Matrix is invalid. There isn't %d square" % square)
 
     return abs(current_coords[0] - target_coords[0]) + abs(current_coords[1] - target_coords[1])
-
-
-def manhattan_dist(current_node: Node, target_state: list, square: int) -> int:
-    return manhattan_dist1(current_node.matrix, target_state, square)
-
-
-def manhattan_dist_sum1(current_state: list, target_state: list, size: int = 3) -> int:
-    if not is_matrix(current_state) or not is_matrix(target_state):
-        raise Exception("Error. Null pointer as argument")
-
-    res_sum = 0
-
-    for i in range(0, size*size):
-        res_sum += manhattan_dist1(current_state, target_state, i)
-
-    return res_sum
-
-
-def manhattan_dist_sum(current_node: Node, target_state: list, size: int = 3) -> int:
-    return manhattan_dist_sum1(current_node.matrix, target_state, size)

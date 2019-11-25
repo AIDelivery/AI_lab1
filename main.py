@@ -15,7 +15,7 @@ def main():
     # print(problem.runBFS())
 
     # LAB2
-    problemExt = eightPuzzleProblemExt(initMatrix, targetMatrix, 0)
+    problemExt = eightPuzzleProblemExt(initMatrix, targetMatrix, 3)
     problemExt.greedy_search()
 
 
