@@ -1,5 +1,4 @@
 from node import Node, find_in_2d_array
-# from util import is_matrix
 
 LOG = True
 
@@ -41,6 +40,8 @@ def count_match_places(current_state: list, target_state: list) -> int:
     #     print("[count_match_places]", current_state, matches)
     return matches
 
+def count_nomatch_places(current_state: list, target_state: list) -> int:
+    return 9 - count_match_places(current_state, target_state)
 
 def which_match_is_greater(target_matrix: list, nodes_to_check, matrix_history: list) -> Node:
     """
@@ -87,7 +88,34 @@ def manhattan_dist(current_state: list, target_state: list, square: int) -> int:
     current_coords = find_in_2d_array(current_state, square)
     target_coords = find_in_2d_array(target_state, square)
 
+    # print("[manhattan_dist] matrix: ", current_state)
+    # print("[manhattan_dist] square: ", square)
+    # print("[manhattan_dist] current_coords: ", current_coords)
+    # print("[manhattan_dist] target_coords: ", target_coords)
+    # print("[manhattan_dist] difference: ", abs(current_coords[0] - target_coords[0]) + abs(current_coords[1] - target_coords[1]))
+
     if current_coords is None or target_coords is None:
         raise Exception("[manhattan_dist] Error. Matrix is invalid. There isn't %d square" % square)
 
     return abs(current_coords[0] - target_coords[0]) + abs(current_coords[1] - target_coords[1])
+
+
+# Heuristic Functions
+def hf1(matrix_to_check: list, target_matrix: list) -> int:
+    res = 0
+
+    if not is_matrix(matrix_to_check):
+        raise Exception("[eightPuzzleProblemExt.hh1] is not a matrix")
+
+    return count_nomatch_places(matrix_to_check, target_matrix)
+
+
+def hf2(matrix_to_check: list, target_matrix: list) -> int:
+    res = 0
+
+    for i in range(0, 9):
+        res += manhattan_dist(matrix_to_check, target_matrix, i)
+
+    print("[eightPuzzleProblemExt.hh2] Manhattan destination sum: ", res)
+    print("[eightPuzzleProblemExt.hh2] of matrix: ", matrix_to_check)
+    return res

@@ -3,19 +3,19 @@ from copy import deepcopy
 LOG = True
 
 
-def find_in_2d_array(matrix: list, i: int = 0, error_log: bool = False) -> list or None:
+def find_in_2d_array(matrix: list, num: int = 0, error_log: bool = False) -> list or None:
     """
     Locate integer in 2-Dimensional array
     
     :param matrix: Given matrix of state
-    :param i: Integer to find
+    :param num: Integer to find
     :return: Coordinates of i = [string][column] or None
     """
 
     try:
         for i in range(0, 3):
             for j in range(0, 3):
-                if matrix[i][j] == 0:
+                if matrix[i][j] == num:
                     return [i, j]
     except:
         if error_log:
@@ -98,6 +98,9 @@ class Node:
         self.childList = list()
 
     def make_childs(self) -> list:
+        if len(self.childList) != 0:
+            return self.childList
+
         null_pnt = find_in_2d_array(self.matrix, 0)
 
         if self.parent is not None:
