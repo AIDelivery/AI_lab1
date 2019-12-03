@@ -9,8 +9,10 @@ targetMatrix = states.ts1
 def main():
 
     problem = EightPuzzleProblem(initMatrix, targetMatrix)
-    problem.run_greedy(0)
-    # problem.run_bfs()
+    problem.run_bfs()
+    # problem.run_dls(20)
+    # problem.run_greedy(0)
+    # problem.run_astar(0)
 
 
 if __name__ == "__main__":

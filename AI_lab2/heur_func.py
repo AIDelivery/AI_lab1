@@ -116,6 +116,6 @@ def hf2(matrix_to_check: list, target_matrix: list) -> int:
     for i in range(0, 9):
         res += manhattan_dist(matrix_to_check, target_matrix, i)
 
-    print("[eightPuzzleProblemExt.hh2] Manhattan destination sum: ", res)
-    print("[eightPuzzleProblemExt.hh2] of matrix: ", matrix_to_check)
+    # print("[hf2] Manhattan destination sum: ", res)
+    # print("[hf2] of matrix: ", matrix_to_check)
     return res
